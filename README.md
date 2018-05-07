@@ -5,7 +5,7 @@
 
 1. Java - 1.8.x
 
-2. Maven - 3.x.x
+2. Gradle - 4.7
 
 3. MongoDB - 3.x.x
 
