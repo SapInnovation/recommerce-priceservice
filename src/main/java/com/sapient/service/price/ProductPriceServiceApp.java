@@ -6,9 +6,9 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 
 @SpringBootApplication
 @EnableReactiveMongoRepositories
-public class ProductPriceService {
+public class ProductPriceServiceApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProductPriceService.class, args);
+		SpringApplication.run(ProductPriceServiceApp.class, args);
 	}
 }

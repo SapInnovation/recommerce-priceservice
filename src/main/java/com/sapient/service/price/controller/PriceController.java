@@ -2,11 +2,15 @@ package com.sapient.service.price.controller;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +33,11 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 public class PriceController {
+	
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired
+	private SubscribableChannel priceChannel;
 
     @Autowired
     private PriceRepository priceRepository;
@@ -74,9 +83,18 @@ public class PriceController {
     }
 
     // price updates are Sent to the client as Server Sent Events
-    @GetMapping(value = "/stream/price", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Price> streamAllPrices() {
-        return priceRepository.findAll();
+    @GetMapping(value = "/stream/price/{productId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Price> streamAllPrices(@PathVariable(value = "productId") String productId) {
+        return Flux.create(stream -> {
+            MessageHandler handler = msg -> {
+                final Price price = Price.class.cast(msg.getPayload());
+                LOGGER.info("Request skuId:" + productId + ", Current Event productId:" + price.getProductId());
+                if (productId == price.getProductId())
+                    stream.next(price);
+            };
+            stream.onCancel(() -> priceChannel.unsubscribe(handler));
+            priceChannel.subscribe(handler);
+        });
     }
 
 

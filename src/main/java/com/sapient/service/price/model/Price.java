@@ -9,10 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * Created by hgupta.
  */
-@Document(collection = "price")
+@Document(collection = "pricedata.price")
 public class Price {
     @Id
-    private String productId;
+    private String Id;
+    
+    @NotBlank
+    private String productid;
 
     @NotBlank
     private Double price;
@@ -25,20 +28,20 @@ public class Price {
     }
 
     public Price(Double price, String productId) {
-        this.productId = productId;
+        this.productid = productId;
         this.price = price;
     }
     
     public Price(String productId) {
-        this.productId = productId;
+        this.productid = productId;
     }
 
     public String getProductId() {
-        return productId;
+        return productid;
     }
 
     public void setProductId(String productId) {
-        this.productId = productId;
+        this.productid = productId;
     }
 
     public Double getPrice() {

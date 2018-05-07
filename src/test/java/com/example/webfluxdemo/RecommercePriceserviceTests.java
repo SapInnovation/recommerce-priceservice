@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class WebfluxDemoApplicationTests {
+public class RecommercePriceserviceTests {
 
 	@Autowired
 	private WebTestClient webTestClient;
@@ -41,7 +41,7 @@ public class WebfluxDemoApplicationTests {
                 .jsonPath("$.productId").isNotEmpty()
                 .jsonPath("$.currency").isEqualTo("GBP");
 	}
-
+	
 	@Test
     public void testGetAllPrices() {
 	    webTestClient.get().uri("/price")
