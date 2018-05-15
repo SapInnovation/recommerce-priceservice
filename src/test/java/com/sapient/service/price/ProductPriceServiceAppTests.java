@@ -1,50 +1,47 @@
-package com.example.webfluxdemo;
-
-import java.util.Collections;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.reactive.server.WebTestClient;
+package com.sapient.service.price;
 
 import com.sapient.service.price.model.Price;
 import com.sapient.service.price.repository.PriceRepository;
-
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-@RunWith(SpringRunner.class)
+import java.util.Collections;
+
+@SpringJUnitConfig(ProductPriceServiceApp.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RecommercePriceserviceTests {
+class ProductPriceServiceAppTests {
 
-	@Autowired
-	private WebTestClient webTestClient;
+    @Autowired
+    private WebTestClient webTestClient;
 
-	@Autowired
+    @Autowired
     PriceRepository priceRepository;
 
-	@Test
-	public void testCreatePrice() {
-		Price price = new Price(10.0, "This is a Test price");
+    @Test
+    void testCreatePrice() {
+        Price price = new Price(10.0, "This is a Test price");
 
-		webTestClient.post().uri("/price")
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
+        webTestClient.post().uri("/price")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .body(Mono.just(price), Price.class)
-				.exchange()
-				.expectStatus().isOk()
-				.expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-				.expectBody()
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectBody()
                 .jsonPath("$.productId").isNotEmpty()
                 .jsonPath("$.currency").isEqualTo("GBP");
-	}
-	
-	@Test
-    public void testGetAllPrices() {
-	    webTestClient.get().uri("/price")
+    }
+
+    @Test
+    void testGetAllPrices() {
+        webTestClient.get().uri("/price")
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .exchange()
                 .expectStatus().isOk()
@@ -53,8 +50,8 @@ public class RecommercePriceserviceTests {
     }
 
     @Test
-    public void testGetSinglePrice() {
-        Price price = priceRepository.save(new Price(10.0,"123")).block();
+    void testGetSinglePrice() {
+        Price price = priceRepository.save(new Price(10.0, "123")).block();
 
         webTestClient.get()
                 .uri("/price/{productId}", Collections.singletonMap("productId", price.getProductId()))
@@ -66,10 +63,10 @@ public class RecommercePriceserviceTests {
     }
 
     @Test
-    public void testUpdatePrice() {
-        Price price = priceRepository.save(new Price(11.0,"123")).block();
+    void testUpdatePrice() {
+        Price price = priceRepository.save(new Price(11.0, "123")).block();
 
-        Price newPriceData = new Price(11.0,"123");
+        Price newPriceData = new Price(11.0, "123");
 
         webTestClient.put()
                 .uri("/price/{productId}", Collections.singletonMap("productId", price.getProductId()))
@@ -84,11 +81,11 @@ public class RecommercePriceserviceTests {
     }
 
     @Test
-    public void testDeletePrice() {
-	    Price price = priceRepository.save(new Price("123")).block();
+    void testDeletePrice() {
+        Price price = priceRepository.save(new Price("123")).block();
 
-	    webTestClient.delete()
-                .uri("/Price/{productId}", Collections.singletonMap("productId",  price.getProductId()))
+        webTestClient.delete()
+                .uri("/Price/{productId}", Collections.singletonMap("productId", price.getProductId()))
                 .exchange()
                 .expectStatus().isOk();
     }
