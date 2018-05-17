@@ -1,5 +1,8 @@
 package com.sapient.service.price.controller;
 
+import java.time.Duration;
+import java.util.HashMap;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -18,12 +21,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rethinkdb.RethinkDB;
+import com.rethinkdb.net.Connection;
+import com.rethinkdb.net.Cursor;
+import com.sapient.service.price.connection.RethinkDBConnectionFactory;
 import com.sapient.service.price.exception.ProductNotFoundException;
 import com.sapient.service.price.model.Price;
 import com.sapient.service.price.payload.ErrorResponse;
-import com.sapient.service.price.repository.PriceRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,66 +47,74 @@ public class PriceController {
 	@Autowired
 	private SubscribableChannel priceChannel;
 
-    @Autowired
-    private PriceRepository priceRepository;
-
-    @GetMapping("/price")
-    public Flux<Price> getAllPrices() {
-        return priceRepository.findAll();
-    }
-
-    @PostMapping("/price")
-    public Mono<Price> createPrices(@Valid @RequestBody Price price) {
-        return priceRepository.save(price);
-    }
-
-    @GetMapping("/price/{productId}")
-    public Mono<ResponseEntity<Price>> getPriceById(@PathVariable(value = "productId") String productId) {
-        return priceRepository.findById(productId)
-                .map(savedPrice -> ResponseEntity.ok(savedPrice))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @PutMapping("/price/{productId}")
-    public Mono<ResponseEntity<Price>> updatePrice(@PathVariable(value = "productId") String productId,
-                                                   @Valid @RequestBody Price price) {
-        return priceRepository.findById(productId)
-                .flatMap(existingPrice -> {
-                    existingPrice.setPrice(price.getPrice());
-                    return priceRepository.save(existingPrice);
-                })
-                .map(updatePrice -> new ResponseEntity<>(updatePrice, HttpStatus.OK))
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
-    @DeleteMapping("/price/{productId}")
-    public Mono<ResponseEntity<Void>> deletePrice(@PathVariable(value = "productId") String productId) {
-
-        return priceRepository.findById(productId)
-                .flatMap(existingPrice ->
-                        priceRepository.delete(existingPrice)
-                            .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK)))
-                )
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
     // price updates are Sent to the client as Server Sent Events
-    @GetMapping(value = "/stream/price/{productId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Price> streamAllPrices(@PathVariable(value = "productId") String productId) {
+    @GetMapping(value = "/stream/price/{skuId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Price> streamAllPrices(@PathVariable(value = "skuId") String skuId) {
         return Flux.create(stream -> {
             MessageHandler handler = msg -> {
                 final Price price = Price.class.cast(msg.getPayload());
-                LOGGER.info("Request skuId:" + productId + ", Current Event productId:" + price.getProductId());
-                if (productId == price.getProductId())
+                LOGGER.info("Request skuId:" + skuId + ", Current Event productId:" + price.getSkuId());
+                if (skuId.equalsIgnoreCase(price.getSkuId()))
                     stream.next(price);
             };
             stream.onCancel(() -> priceChannel.unsubscribe(handler));
             priceChannel.subscribe(handler);
         });
+    	
+    	//return registerStream(skuId);
     }
-
-
-
+    
+    
+    
+    private static final RethinkDB r = RethinkDB.r;
+    @Autowired
+	private RethinkDBConnectionFactory connection;
+    
+    @SuppressWarnings("unchecked")
+    public Flux<Price> registerStream(final long skuId) {
+        LOGGER.info("Registering RethinkDB Streams for skuId: " + skuId);
+        return Flux.create(stream ->
+                Cursor.class.cast(r
+                        .db("pricedata")
+                        .table("price")
+                        .filter(doc -> doc.getField("skuId").eq(skuId))
+                        .changes()
+                        .run(connection.createConnection()))
+                        .forEach(priceUpdate -> stream.next(
+                                (new ObjectMapper())
+                                        .convertValue(HashMap.class.cast(
+                                                Cursor.class.cast(r
+                                                        .db("pricedata")
+                                                        .table("price")
+                                                        .filter(doc -> doc.getField("skuId").eq(skuId))
+                                                        .run(connection.createConnection())).toList().get(0)),
+                                                Price.class))));
+    }
+    
+    
+    @PostMapping(value = "/stream/createPrice")
+    public Mono<Price> createStock(@Valid @RequestBody Price priceStream) {
+        updatePrice(priceStream);
+        return Mono.just(priceStream);
+    }
+    
+    public void updatePrice(final Price priceStream) {
+        HashMap<String, Long> updatedMap = r.db("pricedata")
+                .table("price")
+                .filter(doc -> doc.getField("skuId")
+                        .eq(priceStream.getSkuId()))
+                .update(priceStream)
+                .run(connection.createConnection());
+        if (0 >= (updatedMap.get("replaced")
+                + updatedMap.get("unchanged"))) {
+            r.table("stream")
+                    .insert(priceStream)
+                    .run(connection.createConnection());
+            LOGGER.info("Price record added, skuId:" + priceStream.getSkuId());
+        } else {
+            LOGGER.info("Price record updated, skuId:" + priceStream.getSkuId());
+        }
+    }
 
     /*
         Exception Handling Examples (These can be put into a @ControllerAdvice to handle exceptions globally)
