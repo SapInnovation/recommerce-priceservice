@@ -35,7 +35,7 @@ public class ProductPriceService {
     }*/
     
 	@SuppressWarnings("unchecked")
-    public Flux<Price> registerStream(final long skuId) {
+    public Flux<Price> registerStream(final String skuId) {
         LOGGER.info("Registering RethinkDB Streams for skuId: " + skuId);
         return Flux.create(stream ->
                 Cursor.class.cast(rethinkDB

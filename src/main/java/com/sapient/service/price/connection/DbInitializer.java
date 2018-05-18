@@ -11,7 +11,7 @@ import com.sapient.service.price.listener.DbChangeListener;
 
 public class DbInitializer implements InitializingBean{
 	
-	//@Autowired
+	/*//@Autowired
 	//private RethinkDBConnectionFactory connectionFactory;
 	
 	private final Connection connection;
@@ -23,16 +23,16 @@ public class DbInitializer implements InitializingBean{
 	}
 
 
-	private static final RethinkDB r = RethinkDB.r;
+	private static final RethinkDB r = RethinkDB.r;*/
 	
 	@Override
     public void afterPropertiesSet() throws Exception {
-        createDb();
+        //createDb();
         //dbChangesListener.pushChangesToPriceChannel();
     }
 	
 	
-	private void createDb() {
+	/*private void createDb() {
         //Connection connection = connectionFactory.createConnection();
         List<String> dbList = r.dbList().run(connection);
         if (!dbList.contains("pricedata")) {
@@ -43,5 +43,5 @@ public class DbInitializer implements InitializingBean{
             r.db("pricedata").tableCreate("price").run(connection);
             r.db("pricedata").table("price").indexCreate("skuId").run(connection);
         }
-    }
+    }*/
 }

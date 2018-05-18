@@ -58,7 +58,7 @@ public class PriceController {
 
 	// price updates are Sent to the client as Server Sent Events
     @GetMapping(value = "/stream/price/{skuId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Price> streamAllPrices(@PathVariable(value = "skuId") long skuId) {
+    public Flux<Price> streamAllPrices(@PathVariable(value = "skuId") String skuId) {
         /*return Flux.create(stream -> {
             MessageHandler handler = msg -> {
                 final Price price = Price.class.cast(msg.getPayload());
