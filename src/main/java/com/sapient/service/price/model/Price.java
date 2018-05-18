@@ -1,54 +1,43 @@
 package com.sapient.service.price.model;
 
-import javax.validation.constraints.NotBlank;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 /**
  * Created by hgupta.
  */
-@Document(collection = "pricedata.price")
+@JsonIgnoreProperties(value = "id")
 public class Price {
-    @Id
-    private String Id;
-    
-    @NotBlank
-    private String productid;
-
-    @NotBlank
-    private Double price;
-
-    @NotBlank
+    private String skuId;
+    private Long price;
     private String currency;
 
     public Price() {
 
     }
 
-    public Price(Double price, String productId) {
-        this.productid = productId;
+    public Price(Long price, String skuId) {
+        this.skuId = skuId;
         this.price = price;
     }
     
-    public Price(String productId) {
-        this.productid = productId;
+    public Price(String skuId) {
+        this.skuId = skuId;
     }
 
-    public String getProductId() {
-        return productid;
+    public String getSkuId() {
+        return skuId;
     }
 
-    public void setProductId(String productId) {
-        this.productid = productId;
+    public void setSkuId(String productId) {
+        this.skuId = productId;
     }
 
-    public Double getPrice() {
+    public Long getPrice() {
 		return price;
 	}
 
-	public void setPrice(Double price) {
+	public void setPrice(Long price) {
 		this.price = price;
 	}
 
