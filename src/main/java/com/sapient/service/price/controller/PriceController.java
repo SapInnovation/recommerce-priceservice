@@ -32,6 +32,7 @@ import com.sapient.service.price.connection.RethinkDBConnectionFactory;
 import com.sapient.service.price.exception.ProductNotFoundException;
 import com.sapient.service.price.model.Price;
 import com.sapient.service.price.payload.ErrorResponse;
+import com.sapient.service.price.service.ProductPriceService;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,13 +45,21 @@ public class PriceController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	
-	@Autowired
+	
 	private SubscribableChannel priceChannel;
+	private ProductPriceService priceService;
+	
+	
 
-    // price updates are Sent to the client as Server Sent Events
+    public PriceController(SubscribableChannel priceChannel, final ProductPriceService priceService) {
+		this.priceChannel = priceChannel;
+		this.priceService = priceService;
+	}
+
+	// price updates are Sent to the client as Server Sent Events
     @GetMapping(value = "/stream/price/{skuId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Price> streamAllPrices(@PathVariable(value = "skuId") String skuId) {
-        return Flux.create(stream -> {
+    public Flux<Price> streamAllPrices(@PathVariable(value = "skuId") long skuId) {
+        /*return Flux.create(stream -> {
             MessageHandler handler = msg -> {
                 final Price price = Price.class.cast(msg.getPayload());
                 LOGGER.info("Request skuId:" + skuId + ", Current Event productId:" + price.getSkuId());
@@ -59,62 +68,18 @@ public class PriceController {
             };
             stream.onCancel(() -> priceChannel.unsubscribe(handler));
             priceChannel.subscribe(handler);
-        });
+        });*/
     	
-    	//return registerStream(skuId);
+    	return priceService.registerStream(skuId);
     }
-    
-    
-    
-    private static final RethinkDB r = RethinkDB.r;
-    @Autowired
-	private RethinkDBConnectionFactory connection;
-    
-    @SuppressWarnings("unchecked")
-    public Flux<Price> registerStream(final long skuId) {
-        LOGGER.info("Registering RethinkDB Streams for skuId: " + skuId);
-        return Flux.create(stream ->
-                Cursor.class.cast(r
-                        .db("pricedata")
-                        .table("price")
-                        .filter(doc -> doc.getField("skuId").eq(skuId))
-                        .changes()
-                        .run(connection.createConnection()))
-                        .forEach(priceUpdate -> stream.next(
-                                (new ObjectMapper())
-                                        .convertValue(HashMap.class.cast(
-                                                Cursor.class.cast(r
-                                                        .db("pricedata")
-                                                        .table("price")
-                                                        .filter(doc -> doc.getField("skuId").eq(skuId))
-                                                        .run(connection.createConnection())).toList().get(0)),
-                                                Price.class))));
-    }
-    
     
     @PostMapping(value = "/stream/createPrice")
     public Mono<Price> createStock(@Valid @RequestBody Price priceStream) {
-        updatePrice(priceStream);
+        priceService.updatePrice(priceStream);
         return Mono.just(priceStream);
     }
     
-    public void updatePrice(final Price priceStream) {
-        HashMap<String, Long> updatedMap = r.db("pricedata")
-                .table("price")
-                .filter(doc -> doc.getField("skuId")
-                        .eq(priceStream.getSkuId()))
-                .update(priceStream)
-                .run(connection.createConnection());
-        if (0 >= (updatedMap.get("replaced")
-                + updatedMap.get("unchanged"))) {
-            r.table("stream")
-                    .insert(priceStream)
-                    .run(connection.createConnection());
-            LOGGER.info("Price record added, skuId:" + priceStream.getSkuId());
-        } else {
-            LOGGER.info("Price record updated, skuId:" + priceStream.getSkuId());
-        }
-    }
+    
 
     /*
         Exception Handling Examples (These can be put into a @ControllerAdvice to handle exceptions globally)

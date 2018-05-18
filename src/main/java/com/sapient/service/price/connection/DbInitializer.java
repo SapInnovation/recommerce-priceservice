@@ -11,14 +11,18 @@ import com.sapient.service.price.listener.DbChangeListener;
 
 public class DbInitializer implements InitializingBean{
 	
-	@Autowired
-	private RethinkDBConnectionFactory connectionFactory;
+	//@Autowired
+	//private RethinkDBConnectionFactory connectionFactory;
 	
-	@Autowired
-	private DbChangeListener dbChangesListener;
-	
+	private final Connection connection;
 	
 	
+	
+	public DbInitializer(Connection connection) {
+		this.connection = connection;
+	}
+
+
 	private static final RethinkDB r = RethinkDB.r;
 	
 	@Override
@@ -29,7 +33,7 @@ public class DbInitializer implements InitializingBean{
 	
 	
 	private void createDb() {
-        Connection connection = connectionFactory.createConnection();
+        //Connection connection = connectionFactory.createConnection();
         List<String> dbList = r.dbList().run(connection);
         if (!dbList.contains("pricedata")) {
             r.dbCreate("pricedata").run(connection);
