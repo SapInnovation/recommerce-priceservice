@@ -1,29 +1,24 @@
 package com.sapient.service.price.configuration;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.rethinkdb.RethinkDB;
+import com.rethinkdb.net.Connection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-
-import com.rethinkdb.RethinkDB;
-import com.rethinkdb.net.Connection;
-import com.sapient.service.price.connection.DbInitializer;
-import com.sapient.service.price.connection.RethinkDBConnectionFactory;
 
 @Configuration
 public class RethinkDBConfiguration {
-	
-	@Autowired
-    private Environment env;
+    @Value(value = "${rethinkdb.host:127.0.0.1}")
+    private String host;
 
-    public static String DBHOST = "127.0.0.1";
-    public static int port = 28015;
-    
+    @Value(value = "${rethinkdb.port:28015}")
+    private int port;
+
+    @Value(value = "${rethinkdb.db}")
+    private String db;
+
     private static final RethinkDB r = RethinkDB.r;
-    
+
     @Bean
     public RethinkDB rethinkDB() {
         return r;
@@ -32,9 +27,9 @@ public class RethinkDBConfiguration {
     @Bean
     public Connection rethinkDBConnection() {
         return r.connection()
-                .hostname(this.env.getProperty("rethinkdb.dbhost"))
-                .port(Integer.valueOf(this.env.getProperty("rethinkdb.port")))
+                .hostname(host)
+                .port(port)
+                .db(db)
                 .connect();
-        }
-
+    }
 }
