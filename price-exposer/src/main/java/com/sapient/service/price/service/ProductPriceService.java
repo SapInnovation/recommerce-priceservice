@@ -47,7 +47,7 @@ public class ProductPriceService {
                         .forEach(priceUpdate -> stream.next(
                                 (new ObjectMapper())
                                         .convertValue(HashMap.class.cast(
-                                                Cursor.class.cast(rethinkDB
+                                        		Cursor.class.cast(rethinkDB
                                                         .db("pricedata")
                                                         .table("price")
                                                         .filter(doc -> doc.getField("skuId").eq(skuId))

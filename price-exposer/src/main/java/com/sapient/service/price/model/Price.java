@@ -29,8 +29,8 @@ public class Price {
         return skuId;
     }
 
-    public void setSkuId(String productId) {
-        this.skuId = productId;
+    public void setSkuId(String skuId) {
+        this.skuId = skuId;
     }
 
     public Long getPrice() {
