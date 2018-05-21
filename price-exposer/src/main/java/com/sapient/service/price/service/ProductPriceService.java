@@ -28,13 +28,8 @@ public class ProductPriceService {
 		this.connection = connection;
 	}
 
-	/*@Publisher(channel = "priceChannel")
-    public Price publishPrice(final Price price) {
-        LOGGER.info("Publishing price Update Event");
-        return price;
-    }*/
-    
-	@SuppressWarnings("unchecked")
+	
+    @SuppressWarnings("unchecked")
     public Flux<Price> registerStream(final String skuId) {
         LOGGER.info("Registering RethinkDB Streams for skuId: " + skuId);
         return Flux.create(stream ->

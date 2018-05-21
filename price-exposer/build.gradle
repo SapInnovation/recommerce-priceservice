@@ -1,8 +1,25 @@
+buildscript {
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.junit.platform:junit-platform-gradle-plugin:1.0.2")
+    }
+    
+    description = 'price-exposer'
+}
+
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'idea'
+apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+
+mainClassName = 'com.sapient.service.price.ProductPriceServiceApp'
 
 description = 'price-exposer'
 
