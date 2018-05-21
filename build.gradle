@@ -1,22 +1,10 @@
 subprojects {
 
-    
-buildscript {
-
 	ext {
 		springBootVersion = '2.0.1.RELEASE'
 		teamName = 'Retail Reactive'
 	}
 
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("org.junit.platform:junit-platform-gradle-plugin:1.0.2")
-    }
-}
     description = "reactiveretail-price"
     group = 'com.sapient.retail.service.price'
     version = '0.0.1-SNAPSHOT'

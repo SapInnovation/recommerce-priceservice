@@ -8,7 +8,6 @@ public class KafkaPriceStreamApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(KafkaPriceStreamApplication.class, args);
-
 	}
 
 }

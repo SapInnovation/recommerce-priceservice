@@ -1,17 +1,13 @@
 package com.sapient.service.price.configuration;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import com.rethinkdb.RethinkDB;
 import com.rethinkdb.net.Connection;
-import com.sapient.service.price.connection.DbInitializer;
-import com.sapient.service.price.connection.RethinkDBConnectionFactory;
 
 @Configuration
 public class RethinkDBConfiguration {
