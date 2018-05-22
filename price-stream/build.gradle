@@ -12,6 +12,10 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+    compile.exclude module: 'spring-boot-starter-tomcat'
+}
+
 dependencies {
 	
     compile project(':price-common')
@@ -19,5 +23,8 @@ dependencies {
     compile ('org.springframework.boot:spring-boot-starter:2.0.1.RELEASE')
 	compile 'org.apache.kafka:kafka-clients:0.11.0.0'
     compile 'ch.qos.logback:logback-classic:1.2.2'
+    compile ('org.springframework.boot:spring-boot-starter-jetty:2.0.2.RELEASE')
+    
+    
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
