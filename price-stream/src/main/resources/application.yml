@@ -1,4 +1,6 @@
 kafka:
   server: localhost:9092
+  intopic: price-data-stream-IN
+  outopic: price-data-stream-OUT
 server:
   port: 4041
