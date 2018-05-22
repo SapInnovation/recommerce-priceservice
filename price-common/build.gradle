@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
+
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+}

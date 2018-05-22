@@ -1,21 +1,10 @@
 package com.sapient.service.price.listener;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeoutException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rethinkdb.RethinkDB;
-import com.rethinkdb.net.Cursor;
-import com.sapient.service.price.connection.RethinkDBConnectionFactory;
-import com.sapient.service.price.model.Price;
-import com.sapient.service.price.service.ProductPriceService;
+import com.sapient.retail.price.common.model.Price;
 
 @Service
 public class DbChangeListener {
