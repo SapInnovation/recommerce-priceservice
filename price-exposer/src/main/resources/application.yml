@@ -3,3 +3,5 @@ rethinkdb:
   port: 28015
   db: price
   sku: skuprice
+server:
+  port: 4040

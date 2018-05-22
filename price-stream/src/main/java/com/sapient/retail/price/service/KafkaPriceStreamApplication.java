@@ -10,5 +10,4 @@ public class KafkaPriceStreamApplication {
 		SpringApplication.run(KafkaPriceStreamApplication.class, args);
 
 	}
-
 }
