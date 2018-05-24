@@ -1,5 +1,8 @@
 # Build Reactive Rest APIs with Spring WebFlux and Reactive MongoDB
 
+[![Build Status](https://travis-ci.com/SapInnovation/recommerce-priceservice.svg?branch=master)](https://travis-ci.com/SapInnovation/recommerce-priceservice)
+[![codecov](https://codecov.io/gh/SapInnovation/recommerce-priceservice/branch/master/graph/badge.svg)](https://codecov.io/gh/SapInnovation/recommerce-priceservice)
+[![BCH compliance](https://bettercodehub.com/edge/badge/SapInnovation/recommerce-priceservice?branch=master)](https://bettercodehub.com/)
 
 ## Requirements
 
