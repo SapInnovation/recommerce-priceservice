@@ -1,17 +1,19 @@
 package com.sapient.service.price.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rethinkdb.RethinkDB;
-import com.rethinkdb.net.Connection;
-import com.rethinkdb.net.Cursor;
-import com.sapient.retail.price.common.model.Price;
+import java.util.HashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
-import java.util.HashMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rethinkdb.RethinkDB;
+import com.rethinkdb.net.Connection;
+import com.rethinkdb.net.Cursor;
+import com.sapient.retail.price.common.model.ProductPrice;
+
+import reactor.core.publisher.Flux;
 
 @Service
 public class ProductPriceService {
@@ -29,12 +31,12 @@ public class ProductPriceService {
 	}
     
 	@SuppressWarnings("unchecked")
-    public Flux<Price> registerStream(final String skuId) {
-        LOGGER.info("Registering RethinkDB Streams for skuId: " + skuId);
+    public Flux<ProductPrice> registerStream(final String productId) {
+        LOGGER.info("Registering RethinkDB Streams for skuId: " + productId);
         return Flux.create(stream ->
                 Cursor.class.cast(rethinkDB
                         .table(skuDocument)
-                        .filter(doc -> doc.getField("skuId").eq(skuId))
+                        .filter(doc -> doc.getField("productId").eq(productId))
                         .changes()
                         .run(connection))
                         .forEach(priceUpdate -> stream.next(
@@ -42,17 +44,17 @@ public class ProductPriceService {
                                         .convertValue(HashMap.class.cast(
                                         		Cursor.class.cast(rethinkDB
                                                         .table(skuDocument)
-                                                        .filter(doc -> doc.getField("skuId").eq(skuId))
+                                                        .filter(doc -> doc.getField("productId").eq(productId))
                                                         .run(connection)).toList().get(0)),
-                                                Price.class))));
+                                                ProductPrice.class))));
     }
 	 
 	 
-	 public void updatePrice(final Price priceStream) {
+	 public void updatePrice(final ProductPrice priceStream) {
 	        HashMap<String, Long> updatedMap = rethinkDB
 	                .table(skuDocument)
 	                .filter(doc -> doc.getField("skuId")
-	                        .eq(priceStream.getSkuId()))
+	                        .eq(priceStream.getProductId()))
 	                .update(priceStream)
 	                .run(connection);
 	        if (0 >= (updatedMap.get("replaced")
@@ -60,9 +62,9 @@ public class ProductPriceService {
 	        	rethinkDB.table(skuDocument)
 	                    .insert(priceStream)
 	                    .run(connection);
-	            LOGGER.info("Price record added, skuId:" + priceStream.getSkuId());
+	            LOGGER.info("Price record added, productId:" + priceStream.getProductId());
 	        } else {
-	            LOGGER.info("Price record updated, skuId:" + priceStream.getSkuId());
+	            LOGGER.info("Price record updated, productId:" + priceStream.getProductId());
 	        }
 	    }
 	 

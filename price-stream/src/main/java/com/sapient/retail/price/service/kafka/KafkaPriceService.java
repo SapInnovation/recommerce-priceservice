@@ -31,10 +31,10 @@ public class KafkaPriceService {
 		try {
 			JsonNode jsonObj = new ObjectMapper().valueToTree(priceData);
 			final ProducerRecord<String, JsonNode> priceRecord = new ProducerRecord<String, JsonNode>(
-					priceKafkaInTopic , priceData.getSkuId(), jsonObj);
+					priceKafkaInTopic , priceData.getProductId(), jsonObj);
 			priceProducer.send(priceRecord, (metadata, exception) -> {
 				if (null != metadata) {
-					logger.info("Sent price data {}", priceData.getSkuId() + " :: " + priceData.getPrice());
+					logger.info("Sent price data {}", priceData.getProductId());
 				} else {
 					logger.error("exception occurred while sending data to topic :: " + exception.getMessage());
 				}
