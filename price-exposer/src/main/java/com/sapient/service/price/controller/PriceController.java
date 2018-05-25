@@ -1,16 +1,23 @@
 package com.sapient.service.price.controller;
 
-import com.sapient.retail.price.common.model.Price;
+import javax.validation.Valid;
+
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sapient.retail.price.common.model.ProductPrice;
 import com.sapient.service.price.exception.ProductNotFoundException;
 import com.sapient.service.price.payload.ErrorResponse;
 import com.sapient.service.price.service.ProductPriceService;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import javax.validation.Valid;
 
 /**
  * Created by hgupta.
@@ -25,13 +32,13 @@ public class PriceController {
     }
 
     // price updates are Sent to the client as Server Sent Events
-    @GetMapping(value = "/stream/price/{skuId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Price> streamAllPrices(@PathVariable(value = "skuId") String skuId) {
-        return priceService.registerStream(skuId);
+    @GetMapping(value = "/stream/price/{productId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ProductPrice> streamAllPrices(@PathVariable(value = "productId") String productId) {
+        return priceService.registerStream(productId);
     }
 
     @PostMapping(value = "/stream/createPrice")
-    public Mono<Price> createStock(@Valid @RequestBody Price priceStream) {
+    public Mono<ProductPrice> createStock(@Valid @RequestBody ProductPrice priceStream) {
         priceService.updatePrice(priceStream);
         return Mono.just(priceStream);
     }
