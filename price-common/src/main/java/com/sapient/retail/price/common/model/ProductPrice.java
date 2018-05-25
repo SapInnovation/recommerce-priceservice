@@ -1,10 +1,13 @@
 package com.sapient.retail.price.common.model;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * @author hitgupta
  *
  */
+@JsonIgnoreProperties(value = "id")
 public class ProductPrice {
 	
 	private String productId;
