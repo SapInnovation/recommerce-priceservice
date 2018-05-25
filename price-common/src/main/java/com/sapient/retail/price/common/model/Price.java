@@ -1,49 +1,50 @@
 package com.sapient.retail.price.common.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
 
-import java.math.BigDecimal;
+import com.sapient.retail.price.common.model.SKUPrice;
 
-
-/**
- * Created by hgupta.
- */
-@JsonIgnoreProperties(value = "id")
 public class Price {
-    private String skuId;
-    private String productId;
-    private BigDecimal price;
-    private String currency;
 
-    public String getSkuId() {
-        return skuId;
-    }
-
-    public void setSkuId(String skuId) {
-        this.skuId = skuId;
-    }
-
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
+	private String productId;
+	private String currency;
+	private List<SKUPrice> skuPrice;
+	/**
+	 * @return the productID
+	 */
+	public String getProductId() {
+		return productId;
+	}
+	/**
+	 * @param productID the productID to set
+	 */
+	public void setProductId(String productId) {
+		this.productId = productId;
+	}
+	/**
+	 * @return the skuPrice
+	 */
+	public List<SKUPrice> getSkuPrice() {
+		return skuPrice;
+	}
+	/**
+	 * @param skuPrice the skuPrice to set
+	 */
+	public void setSkuPrice(List<SKUPrice> skuPrice) {
+		this.skuPrice = skuPrice;
+	}
+	/**
+	 * @return the currency
+	 */
+	public String getCurrency() {
+		return currency;
+	}
+	/**
+	 * @param currency the currency to set
+	 */
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+	
+	
 }
