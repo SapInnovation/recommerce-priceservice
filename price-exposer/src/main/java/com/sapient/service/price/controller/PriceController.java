@@ -25,29 +25,50 @@ import reactor.core.publisher.Mono;
 @RestController
 public class PriceController {
 
-    private ProductPriceService priceService;
+	private ProductPriceService priceService;
 
-    public PriceController(final ProductPriceService priceService) {
-        this.priceService = priceService;
-    }
+	public PriceController(final ProductPriceService priceService) {
+		this.priceService = priceService;
+	}
 
-    // price updates are Sent to the client as Server Sent Events
-    @GetMapping(value = "/stream/price/{productId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ProductPrice> streamAllPrices(@PathVariable(value = "productId") String productId) {
-        return priceService.registerStream(productId);
-    }
+	/**
+	 * @param productId
+	 * @return
+	 */
+	@GetMapping(value = "/stream/price/{productId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<ProductPrice> streamAllPrices(@PathVariable(value = "productId") String productId) {
+		return priceService.registerStream(productId);
+	}
 
-    @PostMapping(value = "/stream/createPrice")
-    public Mono<ProductPrice> createStock(@Valid @RequestBody ProductPrice priceStream) {
-        priceService.updatePrice(priceStream);
-        return Mono.just(priceStream);
-    }
+	/**
+	 * @param productId
+	 * @return
+	 */
+	@GetMapping(value = "/price/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ProductPrice getProductData(@PathVariable(value = "productId") String productId) {
+		return priceService.getProductAndSkuData(productId);
+	}
 
-    /*
-        Exception Handling Examples (These can be put into a @ControllerAdvice to handle exceptions globally)
-    */
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> productNotFoundException(ProductNotFoundException ex) {
-        return ResponseEntity.notFound().build();
-    }
+	/**
+	 * @param priceStream
+	 * @return
+	 */
+	@PostMapping(value = "/stream/createPrice")
+	public Mono<ProductPrice> createStock(@Valid @RequestBody ProductPrice priceStream) {
+		priceService.updatePrice(priceStream);
+		return Mono.just(priceStream);
+	}
+
+	/*
+	 * Exception Handling Examples (These can be put into a @ControllerAdvice to
+	 * handle exceptions globally)
+	 */
+	/**
+	 * @param ex
+	 * @return
+	 */
+	@ExceptionHandler(ProductNotFoundException.class)
+	public ResponseEntity<ErrorResponse> productNotFoundException(ProductNotFoundException ex) {
+		return ResponseEntity.notFound().build();
+	}
 }
