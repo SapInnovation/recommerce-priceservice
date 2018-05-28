@@ -2,12 +2,20 @@ package com.sapient.retail.price.common.model;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import com.sapient.retail.price.common.model.SKUPrice;
 
 public class Price {
-
+	
+	@NotNull
+	@Size(min = 3, max = 20, message = "Product id should be between 3 and 20 characters")
 	private String productId;
+	
+	@NotNull
 	private String currency;
+	
 	private List<SKUPrice> skuPrice;
 	/**
 	 * @return the productID
