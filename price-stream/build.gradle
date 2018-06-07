@@ -24,6 +24,7 @@ dependencies {
     compile ('org.springframework.boot:spring-boot-starter:2.0.1.RELEASE')
 	compile 'org.apache.kafka:kafka-clients:0.11.0.0'
     compile 'org.apache.kafka:kafka-streams:1.0.0'
+    compile 'org.apache.kafka:kafka_2.10:0.8.2.1'
     compile 'ch.qos.logback:logback-classic:1.2.2'
     compile ('org.springframework.boot:spring-boot-starter-jetty:2.0.2.RELEASE')
     

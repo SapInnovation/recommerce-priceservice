@@ -1,6 +1,6 @@
 rethinkdb:
-  host: 127.0.0.1
-  port: 28015
+  host: del2vmplcireative05.sapient.com
+  port: 32769
   db: price
   sku: skuprice
 server:
