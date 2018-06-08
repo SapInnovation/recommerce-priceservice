@@ -1,7 +1,7 @@
 package com.sapient.retail.price.service.controller;
 
 import org.springframework.http.HttpStatus;
-
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +24,12 @@ public class PriceDataController {
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	public void priceData(@RequestBody Price priceData) {
 		priceService.sendDataToKafkaTopic(priceData);
+	}
+	
+	@RequestMapping(value = "/createtopic/{topicName}", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.ACCEPTED)
+	public void createTopic(@PathVariable String topicName) {
+		priceService.createTopicInKafka(topicName);
 	}
 
 }

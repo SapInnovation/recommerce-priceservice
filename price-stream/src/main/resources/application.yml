@@ -1,5 +1,6 @@
 kafka:
   server: localhost:9092
+  zookeeper: localhost:2181
   intopic: price-data-stream-IN
   outopic: price-data-stream-OUT
 server:
